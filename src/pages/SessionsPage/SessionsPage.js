@@ -1,45 +1,49 @@
+import axios from "axios";
+import { Link, useLoaderData } from "react-router-dom";
 import styled from "styled-components";
+import errorHandler from "../../errorHandler";
+
+export async function loader({ params }) {
+  let showTimes;
+  await axios
+    .get(`movies/${params.idFilme}/showtimes`)
+    .then((response) => {
+      showTimes = response.data;
+    })
+    .catch(errorHandler);
+  return showTimes;
+}
 
 export default function SessionsPage() {
+  const showTimes = useLoaderData();
+
   return (
     <PageContainer>
       Selecione o horário
       <div>
-        <SessionContainer>
-          Sexta - 03/03/2023
-          <ButtonsContainer>
-            <button>14:00</button>
-            <button>15:00</button>
-          </ButtonsContainer>
-        </SessionContainer>
-
-        <SessionContainer>
-          Sexta - 03/03/2023
-          <ButtonsContainer>
-            <button>14:00</button>
-            <button>15:00</button>
-          </ButtonsContainer>
-        </SessionContainer>
-
-        <SessionContainer>
-          Sexta - 03/03/2023
-          <ButtonsContainer>
-            <button>14:00</button>
-            <button>15:00</button>
-          </ButtonsContainer>
-        </SessionContainer>
+        {showTimes.days.map((day) => {
+          return (
+            <SessionContainer key={day.id}>
+              {`${day.weekday} - ${day.date}`}
+              <ButtonsContainer>
+                {day.showtimes.map((showtime) => {
+                  return (
+                    <Link to={`/assentos/${showtime.id}`} key={showtime.id}>
+                      <button>{showtime.name}</button>
+                    </Link>
+                  );
+                })}
+              </ButtonsContainer>
+            </SessionContainer>
+          );
+        })}
       </div>
       <FooterContainer>
         <div>
-          <img
-            src={
-              "https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"
-            }
-            alt="poster"
-          />
+          <img src={showTimes.posterURL} alt={`${showTimes.title} Poster`} />
         </div>
         <div>
-          <p>Tudo em todo lugar ao mesmo tempo</p>
+          <p>{showTimes.title}</p>
         </div>
       </FooterContainer>
     </PageContainer>

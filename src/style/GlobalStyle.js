@@ -18,6 +18,10 @@ const GlobalStyle = createGlobalStyle`
 		&:disabled {
 			background-color: lightgray;
 		}
+
+		&:hover {
+			cursor: pointer;
+		}
 	}
 
 	input {
