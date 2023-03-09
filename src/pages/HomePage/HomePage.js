@@ -1,45 +1,51 @@
+import axios from "axios";
+import { Link, useLoaderData } from "react-router-dom";
 import styled from "styled-components";
 
+export async function loader() {
+  let movies;
+  await axios
+    .get("movies")
+    .then((response) => {
+      movies = response.data;
+    })
+    .catch((error) => {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log("Error", error.message);
+      }
+      console.log(error.config);
+    });
+  return movies;
+}
+
 export default function HomePage() {
+  const movies = useLoaderData();
+
   return (
     <PageContainer>
       Selecione o filme
       <ListContainer>
-        <MovieContainer>
-          <img
-            src={
-              "https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"
-            }
-            alt="poster"
-          />
-        </MovieContainer>
-
-        <MovieContainer>
-          <img
-            src={
-              "https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"
-            }
-            alt="poster"
-          />
-        </MovieContainer>
-
-        <MovieContainer>
-          <img
-            src={
-              "https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"
-            }
-            alt="poster"
-          />
-        </MovieContainer>
-
-        <MovieContainer>
-          <img
-            src={
-              "https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"
-            }
-            alt="poster"
-          />
-        </MovieContainer>
+        {movies.map((movie) => {
+          return (
+            <MovieContainer key={movie.id}>
+              <Link to={`/sessoes/${movie.id}`}>
+                <img src={movie.posterURL} alt={`${movie.title} Poster`} />
+              </Link>
+            </MovieContainer>
+          );
+        })}
       </ListContainer>
     </PageContainer>
   );
