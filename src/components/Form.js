@@ -3,16 +3,15 @@ import styled from "styled-components";
 
 export default function Form({
   selectedSeats,
-  buyersNames,
+  buyerInfo,
   updateBuyerName,
-  buyersCpfs,
   updateBuyerCpf,
   submitHandler,
 }) {
   return (
     <>
       <FormContainer onSubmit={submitHandler}>
-        {selectedSeats.map((seatName) => {
+        {Array.from(selectedSeats).map((seatName) => {
           return (
             <React.Fragment key={seatName}>
               <label
@@ -22,7 +21,7 @@ export default function Form({
                 id={`nome-${seatName}`}
                 required
                 placeholder="Digite o nome..."
-                value={buyersNames.get(seatName) ?? ""}
+                value={buyerInfo.get(seatName).name}
                 onChange={(e) => updateBuyerName(seatName, e.target.value)}
               />
               <label
@@ -32,7 +31,7 @@ export default function Form({
                 id={`cpf-${seatName}`}
                 required
                 placeholder="Digite o CPF..."
-                value={buyersCpfs.get(seatName) ?? ""}
+                value={buyerInfo.get(seatName).cpf}
                 onChange={(e) => updateBuyerCpf(seatName, e.target.value)}
               />
             </React.Fragment>

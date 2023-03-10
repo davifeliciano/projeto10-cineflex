@@ -8,7 +8,7 @@ export default function Seats({ session, selectedSeats, toggleSeatSelection }) {
           <SeatItem
             key={seat.id}
             isAvailable={seat.isAvailable}
-            isSelected={selectedSeats.includes(seat.name)}
+            isSelected={selectedSeats.has(seat.name)}
             onClick={() => toggleSeatSelection(seat.name)}
           >
             {(seat.name.length === 1 ? "0" : "") + seat.name}

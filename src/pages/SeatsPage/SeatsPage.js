@@ -20,14 +20,13 @@ export async function loader({ params }) {
 
 export default function SeatsPage() {
   const session = useLoaderData();
-  const [selectedSeats, setSelectedSeats] = useState([]);
-  const [buyersNames, setBuyersNames] = useState(new Map());
-  const [buyersCpfs, setBuyersCpfs] = useState(new Map());
+  const [selectedSeats, setSelectedSeats] = useState(new Set());
+  const [buyerInfo, setBuyerInfo] = useState(new Map());
 
   function hasAnyBuyerInfo(seatName) {
     return (
-      (buyersNames.get(seatName) ?? "") !== "" ||
-      (buyersCpfs.get(seatName) ?? "") !== ""
+      buyerInfo.get(seatName).name.trim() !== "" ||
+      buyerInfo.get(seatName).cpf.trim() !== ""
     );
   }
 
@@ -35,8 +34,14 @@ export default function SeatsPage() {
     if (!session.seats.find((seat) => seat.name === seatName).isAvailable)
       return;
 
-    if (!selectedSeats.includes(seatName)) {
-      setSelectedSeats([...selectedSeats, seatName]);
+    const selectedSeatsCopy = new Set(selectedSeats);
+    const buyerInfoCopy = new Map(buyerInfo);
+
+    if (!selectedSeats.has(seatName)) {
+      selectedSeatsCopy.add(seatName);
+      setSelectedSeats(selectedSeatsCopy);
+      buyerInfoCopy.set(seatName, { name: "", cpf: "" });
+      setBuyerInfo(buyerInfoCopy);
       return;
     }
 
@@ -45,39 +50,40 @@ export default function SeatsPage() {
       (hasAnyBuyerInfo(seatName) &&
         window.confirm("Deseja realmente remover o assento?"))
     ) {
-      setSelectedSeats(
-        selectedSeats.filter(
-          (selectedSeatName) => selectedSeatName !== seatName
-        )
-      );
+      selectedSeatsCopy.delete(seatName);
+      setSelectedSeats(selectedSeatsCopy);
+      buyerInfoCopy.delete(seatName);
+      setBuyerInfo(buyerInfoCopy);
     }
   }
 
   function updateBuyerName(seatName, buyerName) {
-    const currentBuyersNames = new Map(buyersNames);
-    currentBuyersNames.set(seatName, buyerName);
-    setBuyersNames(currentBuyersNames);
+    const buyerInfoCopy = new Map(buyerInfo);
+    const { cpf } = buyerInfoCopy.get(seatName);
+    buyerInfoCopy.set(seatName, { cpf, name: buyerName });
+    setBuyerInfo(buyerInfoCopy);
   }
 
   function updateBuyerCpf(seatName, buyerCpf) {
-    const currentBuyersCpfs = new Map(buyersCpfs);
-    currentBuyersCpfs.set(seatName, buyerCpf);
-    setBuyersCpfs(currentBuyersCpfs);
+    const buyerInfoCopy = new Map(buyerInfo);
+    const { name } = buyerInfoCopy.get(seatName);
+    buyerInfoCopy.set(seatName, { name, cpf: buyerCpf });
+    setBuyerInfo(buyerInfoCopy);
   }
 
   function submitHandler(event) {
     event.preventDefault();
 
-    const ids = selectedSeats.map(
-      (seatName) => session.seats.find((seat) => seat.name === seatName).id
-    );
+    const ids = Array.from(selectedSeats).map((seatName) => {
+      return session.seats.find((seat) => seat.name === seatName).id;
+    });
 
     const compradores = ids.map((id) => {
       const seat = session.seats.find((seat) => seat.id === id);
       return {
         idAssento: id,
-        nome: buyersNames.get(seat.name).trim(),
-        cpf: buyersCpfs.get(seat.name).trim(),
+        nome: buyerInfo.get(seat.name).name.trim(),
+        cpf: buyerInfo.get(seat.name).cpf.trim(),
       };
     });
 
@@ -98,9 +104,8 @@ export default function SeatsPage() {
       />
       <Form
         selectedSeats={selectedSeats}
-        buyersNames={buyersNames}
+        buyerInfo={buyerInfo}
         updateBuyerName={updateBuyerName}
-        buyersCpfs={buyersCpfs}
         updateBuyerCpf={updateBuyerCpf}
         submitHandler={submitHandler}
       />
