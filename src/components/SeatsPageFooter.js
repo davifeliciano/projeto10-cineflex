@@ -3,7 +3,7 @@ import styled from "styled-components";
 export default function Footer({ session }) {
   return (
     <>
-      <FooterContainer>
+      <FooterContainer data-test="footer">
         <div>
           <img
             src={session.movie.posterURL}

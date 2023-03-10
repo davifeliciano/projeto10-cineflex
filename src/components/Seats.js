@@ -10,6 +10,7 @@ export default function Seats({ session, selectedSeats, toggleSeatSelection }) {
             isAvailable={seat.isAvailable}
             isSelected={selectedSeats.has(seat.name)}
             onClick={() => toggleSeatSelection(seat.name)}
+            data-test="seat"
           >
             {(seat.name.length === 1 ? "0" : "") + seat.name}
           </SeatItem>

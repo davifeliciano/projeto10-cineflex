@@ -7,7 +7,7 @@ export default function MovieList({ movies }) {
       <ListContainer>
         {movies.map((movie) => {
           return (
-            <MovieContainer key={movie.id}>
+            <MovieContainer key={movie.id} data-test="movie">
               <Link to={`/sessoes/${movie.id}`}>
                 <img src={movie.posterURL} alt={`${movie.title} Poster`} />
               </Link>

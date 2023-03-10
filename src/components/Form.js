@@ -23,6 +23,7 @@ export default function Form({
                 placeholder="Digite o nome..."
                 value={buyerInfo.get(seatName).name}
                 onChange={(e) => updateBuyerName(seatName, e.target.value)}
+                data-test="client-name"
               />
               <label
                 htmlFor={`cpf-${seatName}`}
@@ -33,12 +34,15 @@ export default function Form({
                 placeholder="Digite o CPF..."
                 value={buyerInfo.get(seatName).cpf}
                 onChange={(e) => updateBuyerCpf(seatName, e.target.value)}
+                data-test="client-cpf"
               />
             </React.Fragment>
           );
         })}
 
-        <button type="submit">Reservar Assento(s)</button>
+        <button type="submit" data-test="book-seat-btn">
+          Reservar Assento(s)
+        </button>
       </FormContainer>
     </>
   );

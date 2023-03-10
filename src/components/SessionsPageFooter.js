@@ -3,7 +3,7 @@ import styled from "styled-components";
 export default function SessionsPageFooter({ showTimes }) {
   return (
     <>
-      <FooterContainer>
+      <FooterContainer data-test="footer">
         <div>
           <img src={showTimes.posterURL} alt={`${showTimes.title} Poster`} />
         </div>
