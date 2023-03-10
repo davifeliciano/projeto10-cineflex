@@ -1,49 +1,159 @@
+import axios from "axios";
+import React, { useState } from "react";
+import { useLoaderData } from "react-router-dom";
 import styled from "styled-components";
+import errorHandler from "../../errorHandler";
+
+export async function loader({ params }) {
+  let session;
+  await axios
+    .get(`showtimes/${params.idSessao}/seats`)
+    .then((response) => {
+      session = response.data;
+    })
+    .catch(errorHandler);
+  return session;
+}
 
 export default function SeatsPage() {
+  const session = useLoaderData();
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [buyersNames, setBuyersNames] = useState(new Map());
+  const [buyersCpfs, setBuyersCpfs] = useState(new Map());
+
+  function hasAnyBuyerInfo(seatName) {
+    return (
+      (buyersNames.get(seatName) ?? "") !== "" ||
+      (buyersCpfs.get(seatName) ?? "") !== ""
+    );
+  }
+
+  function toggleSeatSelection(seatName) {
+    if (!session.seats.find((seat) => seat.name === seatName).isAvailable)
+      return;
+
+    if (!selectedSeats.includes(seatName)) {
+      setSelectedSeats([...selectedSeats, seatName]);
+      return;
+    }
+
+    if (
+      !hasAnyBuyerInfo(seatName) ||
+      (hasAnyBuyerInfo(seatName) &&
+        window.confirm("Deseja realmente remover o assento?"))
+    ) {
+      setSelectedSeats(
+        selectedSeats.filter(
+          (selectedSeatName) => selectedSeatName !== seatName
+        )
+      );
+    }
+  }
+
+  function updateBuyerName(seatName, buyerName) {
+    const currentBuyersNames = new Map(buyersNames);
+    currentBuyersNames.set(seatName, buyerName);
+    setBuyersNames(currentBuyersNames);
+  }
+
+  function updateBuyerCpf(seatName, buyerCpf) {
+    const currentBuyersCpfs = new Map(buyersCpfs);
+    currentBuyersCpfs.set(seatName, buyerCpf);
+    setBuyersCpfs(currentBuyersCpfs);
+  }
+
+  function submitHandler(event) {
+    event.preventDefault();
+
+    const ids = selectedSeats.map(
+      (seatName) => session.seats.find((seat) => seat.name === seatName).id
+    );
+
+    const compradores = ids.map((id) => {
+      const seat = session.seats.find((seat) => seat.id === id);
+      return {
+        idAssento: id,
+        nome: buyersNames.get(seat.name).trim(),
+        cpf: buyersCpfs.get(seat.name).trim(),
+      };
+    });
+
+    if (compradores.some((buyer) => buyer.nome === "" || buyer.cpf === ""))
+      return;
+
+    const requestPayload = { ids, compradores };
+    console.log(requestPayload);
+  }
+
   return (
     <PageContainer>
       Selecione o(s) assento(s)
       <SeatsContainer>
-        <SeatItem>01</SeatItem>
-        <SeatItem>02</SeatItem>
-        <SeatItem>03</SeatItem>
-        <SeatItem>04</SeatItem>
-        <SeatItem>05</SeatItem>
+        {session.seats.map((seat) => (
+          <SeatItem
+            key={seat.id}
+            isAvailable={seat.isAvailable}
+            isSelected={selectedSeats.includes(seat.name)}
+            onClick={() => toggleSeatSelection(seat.name)}
+          >
+            {(seat.name.length === 1 ? "0" : "") + seat.name}
+          </SeatItem>
+        ))}
       </SeatsContainer>
       <CaptionContainer>
         <CaptionItem>
-          <CaptionCircle />
+          <CaptionCircle isSelected={true} />
           Selecionado
         </CaptionItem>
         <CaptionItem>
-          <CaptionCircle />
+          <CaptionCircle isAvailable={true} />
           Disponível
         </CaptionItem>
         <CaptionItem>
-          <CaptionCircle />
+          <CaptionCircle isAvailable={false} />
           Indisponível
         </CaptionItem>
       </CaptionContainer>
-      <FormContainer>
-        Nome do Comprador:
-        <input placeholder="Digite seu nome..." />
-        CPF do Comprador:
-        <input placeholder="Digite seu CPF..." />
-        <button>Reservar Assento(s)</button>
+      <FormContainer onSubmit={submitHandler}>
+        {selectedSeats.map((seatName) => {
+          return (
+            <React.Fragment key={seatName}>
+              <label
+                htmlFor={`nome-${seatName}`}
+              >{`Nome do Comprador do Assento ${seatName}`}</label>
+              <input
+                id={`nome-${seatName}`}
+                required
+                placeholder="Digite o nome..."
+                value={buyersNames.get(seatName) ?? ""}
+                onChange={(e) => updateBuyerName(seatName, e.target.value)}
+              />
+              <label
+                htmlFor={`cpf-${seatName}`}
+              >{`CPF do Comprador do Assento ${seatName}`}</label>
+              <input
+                id={`cpf-${seatName}`}
+                required
+                placeholder="Digite o CPF..."
+                value={buyersCpfs.get(seatName) ?? ""}
+                onChange={(e) => updateBuyerCpf(seatName, e.target.value)}
+              />
+            </React.Fragment>
+          );
+        })}
+
+        <button type="submit">Reservar Assento(s)</button>
       </FormContainer>
       <FooterContainer>
         <div>
           <img
-            src={
-              "https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"
-            }
-            alt="poster"
+            src={session.movie.posterURL}
+            alt={`${session.movie.title} Poster`}
           />
         </div>
         <div>
-          <p>Tudo em todo lugar ao mesmo tempo</p>
-          <p>Sexta - 14h00</p>
+          <p>{session.movie.title}</p>
+          <p>{`${session.day.weekday} - ${session.name}`}</p>
         </div>
       </FooterContainer>
     </PageContainer>
@@ -73,13 +183,17 @@ const SeatsContainer = styled.div`
   margin-top: 20px;
 `;
 
-const FormContainer = styled.div`
+const FormContainer = styled.form`
   width: calc(100vw - 40px);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin: 20px 0;
   font-size: 18px;
+
+  label {
+    font-size: 1rem;
+  }
 
   button {
     align-self: center;
@@ -99,8 +213,21 @@ const CaptionContainer = styled.div`
 `;
 
 const CaptionCircle = styled.div`
-  border: 1px solid blue; // Essa cor deve mudar
-  background-color: lightblue; // Essa cor deve mudar
+  border: 1px solid
+    ${(props) => {
+      return props.isSelected
+        ? "#0e7d71"
+        : props.isAvailable
+        ? "#808f9d"
+        : "#f7c52b";
+    }};
+  background-color: ${(props) => {
+    return props.isSelected
+      ? "#1aae9e"
+      : props.isAvailable
+      ? "#c3cfd9"
+      : "#fbe192";
+  }};
   height: 25px;
   width: 25px;
   border-radius: 25px;
@@ -117,18 +244,14 @@ const CaptionItem = styled.div`
   font-size: 12px;
 `;
 
-const SeatItem = styled.div`
-  border: 1px solid blue; // Essa cor deve mudar
-  background-color: lightblue; // Essa cor deve mudar
-  height: 25px;
-  width: 25px;
-  border-radius: 25px;
+const SeatItem = styled(CaptionCircle)`
   font-family: "Roboto";
   font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 5px 3px;
+  user-select: none;
+
+  &:hover {
+    cursor: ${(props) => (props.isAvailable ? "pointer" : "not-allowed")};
+  }
 `;
 
 const FooterContainer = styled.div`

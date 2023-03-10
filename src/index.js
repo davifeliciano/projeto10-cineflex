@@ -4,6 +4,9 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import HomePage, { loader as homePageLoader } from "./pages/HomePage/HomePage";
+import SeatsPage, {
+  loader as seatsPageLoader,
+} from "./pages/SeatsPage/SeatsPage";
 import SessionsPage, {
   loader as sessionsPageLoader,
 } from "./pages/SessionsPage/SessionsPage";
@@ -22,6 +25,11 @@ const router = createBrowserRouter([
     path: "/sessoes/:idFilme",
     element: <SessionsPage />,
     loader: sessionsPageLoader,
+  },
+  {
+    path: "/assentos/:idSessao",
+    element: <SeatsPage />,
+    loader: seatsPageLoader,
   },
 ]);
 
