@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Seats from "../../components/Seats";
 import Form from "../../components/Form";
@@ -20,6 +20,7 @@ export async function loader({ params }) {
 
 export default function SeatsPage() {
   const session = useLoaderData();
+  const navigate = useNavigate();
   const [selectedSeats, setSelectedSeats] = useState(new Set());
   const [buyerInfo, setBuyerInfo] = useState(new Map());
 
@@ -71,7 +72,7 @@ export default function SeatsPage() {
     setBuyerInfo(buyerInfoCopy);
   }
 
-  function submitHandler(event) {
+  async function submitHandler(event) {
     event.preventDefault();
 
     const ids = Array.from(selectedSeats).map((seatName) => {
@@ -91,7 +92,13 @@ export default function SeatsPage() {
       return;
 
     const requestPayload = { ids, compradores };
-    console.log(requestPayload);
+    await axios
+      .post("seats/book-many", requestPayload)
+      .then((response) => {
+        console.log(response);
+        navigate("/sucesso", { state: { session, requestPayload } });
+      })
+      .catch(errorHandler);
   }
 
   return (

@@ -10,6 +10,7 @@ import SeatsPage, {
 import SessionsPage, {
   loader as sessionsPageLoader,
 } from "./pages/SessionsPage/SessionsPage";
+import SuccessPage from "./pages/SuccessPage/SuccessPage";
 import GlobalStyle from "./style/GlobalStyle";
 import ResetStyle from "./style/ResetStyle";
 
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
     path: "/assentos/:idSessao",
     element: <SeatsPage />,
     loader: seatsPageLoader,
+  },
+  {
+    path: "/sucesso",
+    element: <SuccessPage />,
   },
 ]);
 
