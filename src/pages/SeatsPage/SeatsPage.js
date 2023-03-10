@@ -31,9 +31,11 @@ export default function SeatsPage() {
     );
   }
 
-  function toggleSeatSelection(seatName) {
-    if (!session.seats.find((seat) => seat.name === seatName).isAvailable)
+  function toggleSeatSelection(seatName, seatAvailable) {
+    if (!seatAvailable) {
+      alert("Esse assento não está disponível");
       return;
+    }
 
     const selectedSeatsCopy = new Set(selectedSeats);
     const buyerInfoCopy = new Map(buyerInfo);

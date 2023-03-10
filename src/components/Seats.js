@@ -9,7 +9,7 @@ export default function Seats({ session, selectedSeats, toggleSeatSelection }) {
             key={seat.id}
             isAvailable={seat.isAvailable}
             isSelected={selectedSeats.has(seat.name)}
-            onClick={() => toggleSeatSelection(seat.name)}
+            onClick={() => toggleSeatSelection(seat.name, seat.isAvailable)}
             data-test="seat"
           >
             {(seat.name.length === 1 ? "0" : "") + seat.name}
