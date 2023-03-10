@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useLoaderData } from "react-router-dom";
 import styled from "styled-components";
+import Header from "../../components/Header";
 import MovieList from "../../components/MovieList";
 import errorHandler from "../../errorHandler";
 
@@ -19,10 +20,13 @@ export default function HomePage() {
   const movies = useLoaderData();
 
   return (
-    <PageContainer>
-      Selecione o filme
-      <MovieList movies={movies} />
-    </PageContainer>
+    <>
+      <Header />
+      <PageContainer>
+        Selecione o filme
+        <MovieList movies={movies} />
+      </PageContainer>
+    </>
   );
 }
 

@@ -6,6 +6,7 @@ import Seats from "../../components/Seats";
 import Form from "../../components/Form";
 import SeatsPageFooter from "../../components/SeatsPageFooter";
 import errorHandler from "../../errorHandler";
+import Header from "../../components/Header";
 
 export async function loader({ params }) {
   let session;
@@ -104,22 +105,25 @@ export default function SeatsPage() {
   }
 
   return (
-    <PageContainer>
-      Selecione o(s) assento(s)
-      <Seats
-        session={session}
-        selectedSeats={selectedSeats}
-        toggleSeatSelection={toggleSeatSelection}
-      />
-      <Form
-        selectedSeats={selectedSeats}
-        buyerInfo={buyerInfo}
-        updateBuyerName={updateBuyerName}
-        updateBuyerCpf={updateBuyerCpf}
-        submitHandler={submitHandler}
-      />
-      <SeatsPageFooter session={session} />
-    </PageContainer>
+    <>
+      <Header />
+      <PageContainer>
+        Selecione o(s) assento(s)
+        <Seats
+          session={session}
+          selectedSeats={selectedSeats}
+          toggleSeatSelection={toggleSeatSelection}
+        />
+        <Form
+          selectedSeats={selectedSeats}
+          buyerInfo={buyerInfo}
+          updateBuyerName={updateBuyerName}
+          updateBuyerCpf={updateBuyerCpf}
+          submitHandler={submitHandler}
+        />
+        <SeatsPageFooter session={session} />
+      </PageContainer>
+    </>
   );
 }
 

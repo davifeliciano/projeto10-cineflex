@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Link, useLoaderData } from "react-router-dom";
 import styled from "styled-components";
+import Header from "../../components/Header";
 import SessionsPageFooter from "../../components/SessionsPageFooter";
 import errorHandler from "../../errorHandler";
 
@@ -19,32 +20,35 @@ export default function SessionsPage() {
   const showTimes = useLoaderData();
 
   return (
-    <PageContainer>
-      Selecione o horário
-      <div>
-        {showTimes.days.map((day) => {
-          return (
-            <SessionContainer key={day.id} data-test="movie-day">
-              {`${day.weekday} - ${day.date}`}
-              <ButtonsContainer>
-                {day.showtimes.map((showtime) => {
-                  return (
-                    <Link
-                      to={`/assentos/${showtime.id}`}
-                      key={showtime.id}
-                      data-test="showtime"
-                    >
-                      <button>{showtime.name}</button>
-                    </Link>
-                  );
-                })}
-              </ButtonsContainer>
-            </SessionContainer>
-          );
-        })}
-      </div>
-      <SessionsPageFooter showTimes={showTimes} />
-    </PageContainer>
+    <>
+      <Header />
+      <PageContainer>
+        Selecione o horário
+        <div>
+          {showTimes.days.map((day) => {
+            return (
+              <SessionContainer key={day.id} data-test="movie-day">
+                {`${day.weekday} - ${day.date}`}
+                <ButtonsContainer>
+                  {day.showtimes.map((showtime) => {
+                    return (
+                      <Link
+                        to={`/assentos/${showtime.id}`}
+                        key={showtime.id}
+                        data-test="showtime"
+                      >
+                        <button>{showtime.name}</button>
+                      </Link>
+                    );
+                  })}
+                </ButtonsContainer>
+              </SessionContainer>
+            );
+          })}
+        </div>
+        <SessionsPageFooter showTimes={showTimes} />
+      </PageContainer>
+    </>
   );
 }
 
