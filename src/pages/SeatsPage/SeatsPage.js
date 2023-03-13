@@ -78,6 +78,8 @@ export default function SeatsPage() {
   async function submitHandler(event) {
     event.preventDefault();
 
+    if (selectedSeats.size === 0) return;
+
     const ids = Array.from(selectedSeats).map((seatName) => {
       return session.seats.find((seat) => seat.name === seatName).id;
     });
