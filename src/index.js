@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
+import ErrorPage from "./pages/ErrorPage";
 import HomePage, { loader as homePageLoader } from "./pages/HomePage/HomePage";
 import SeatsPage, {
   loader as seatsPageLoader,
@@ -20,21 +21,25 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
+    errorElement: <ErrorPage />,
     loader: homePageLoader,
   },
   {
     path: "/sessoes/:idFilme",
     element: <SessionsPage />,
+    errorElement: <ErrorPage />,
     loader: sessionsPageLoader,
   },
   {
     path: "/assentos/:idSessao",
     element: <SeatsPage />,
+    errorElement: <ErrorPage />,
     loader: seatsPageLoader,
   },
   {
     path: "/sucesso",
     element: <SuccessPage />,
+    errorElement: <ErrorPage />,
   },
 ]);
 
