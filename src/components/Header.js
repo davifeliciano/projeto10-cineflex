@@ -7,11 +7,7 @@ export default function Header() {
 
   return (
     <NavContainer>
-      <BackButton
-        to={-1}
-        display={pathname !== "/"}
-        data-test="go-home-header-btn"
-      >
+      <BackButton to={-1} path={pathname} data-test="go-home-header-btn">
         <BiArrowBack />
       </BackButton>
       <Link to="/">CINEFLEX</Link>
@@ -39,7 +35,7 @@ const NavContainer = styled.div`
 `;
 
 const BackButton = styled(Link)`
-  display: ${(props) => (props.display ? "" : "none")};
+  display: ${(props) => (props.path === "/" ? "none" : "")};
   width: 1rem;
   height: 2rem;
   position: absolute;
@@ -47,4 +43,6 @@ const BackButton = styled(Link)`
   top: 50%;
   transform: translateY(-50%);
   background-color: transparent;
+  user-select: none;
+  -webkit-user-drag: none;
 `;
